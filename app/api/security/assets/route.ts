@@ -1,0 +1,136 @@
+import {
+NextRequest,
+NextResponse
+} from "next/server";
+
+
+import {
+connectDB
+} from "@/lib/mongodb";
+
+
+import Asset from "@/models/Asset";
+
+
+
+
+
+export async function GET(){
+
+
+try{
+
+
+await connectDB();
+
+
+
+const assets =
+await Asset
+.find()
+.sort({
+createdAt:-1
+});
+
+
+
+return NextResponse.json(
+assets
+);
+
+
+
+}
+
+catch(error){
+
+
+console.log(error);
+
+
+
+return NextResponse.json(
+
+{
+message:"Failed to load assets"
+},
+
+{
+status:500
+}
+
+);
+
+
+}
+
+
+}
+
+
+
+
+
+
+
+
+export async function POST(
+req:NextRequest
+){
+
+
+try{
+
+
+await connectDB();
+
+
+
+const body =
+await req.json();
+
+
+
+const asset =
+await Asset.create(
+body
+);
+
+
+
+return NextResponse.json(
+asset,
+{
+status:201
+}
+);
+
+
+
+}
+
+catch(error){
+
+
+console.log(error);
+
+
+
+return NextResponse.json(
+
+{
+message:"Asset creation failed"
+},
+
+{
+status:500
+}
+
+);
+
+
+}
+
+
+
+}
