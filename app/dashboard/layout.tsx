@@ -3,43 +3,70 @@ import Navbar from "@/components/navbar/navbar";
 
 
 export default function DashboardLayout({
+
 children
+
 }:{
+
 children:React.ReactNode
+
 }){
 
 
-return(
+return (
 
 <div
+
 className="
 flex
-min-h-screen
+h-screen
+overflow-hidden
 bg-[#050816]
 "
+
 >
 
 
-<Sidebar/>
+{/* Sidebar */}
 
+<Sidebar />
+
+
+
+
+
+{/* Main */}
 
 <div
+
 className="
 flex
 flex-1
 flex-col
+overflow-hidden
 "
+
 >
 
 
-<Navbar/>
+{/* Navbar */}
 
+<Navbar />
+
+
+
+
+
+{/* Scroll Area */}
 
 <main
+
 className="
 flex-1
+overflow-y-auto
 p-6
 "
+
 >
 
 {children}
@@ -47,11 +74,15 @@ p-6
 </main>
 
 
-</div>
 
 
 </div>
 
-)
+
+
+</div>
+
+);
+
 
 }

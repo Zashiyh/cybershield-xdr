@@ -5,6 +5,12 @@ import ThreatChart from "@/components/dashboard/threat-chart";
 import RecentAlerts from "@/components/dashboard/recent-alerts";
 import AISummary from "@/components/dashboard/ai-summary";
 import HealthCard from "@/components/dashboard/health-card";
+import AttackMap from "@/components/dashboard/attack-map";
+import LiveThreatFeed from "@/components/dashboard/live-threat-feed";
+import IPChecker from "@/components/security/ip-checker";
+import ThreatScanHistory from "@/components/dashboard/threat-scan-history";
+import ThreatAnalytics from "@/components/dashboard/threat-analytics";
+
 import {
   ShieldAlert,
   TriangleAlert,
@@ -17,28 +23,42 @@ import {
 
 export default function DashboardPage() {
 
+
   return (
 
     <div className="space-y-8">
 
 
-      {/* Page Header */}
+      {/* Header */}
+
       <div>
 
-        <h1 className="text-4xl font-bold text-white">
+        <h1
+          className="
+          text-4xl
+          font-bold
+          text-white
+          "
+        >
           Security Dashboard
         </h1>
 
 
-        <p className="mt-2 text-slate-400">
-          Welcome to CyberShield XDR Security Operations Center
+        <p
+          className="
+          mt-2
+          text-slate-400
+          "
+        >
+          AI Powered Cyber Security Operations Center
         </p>
 
       </div>
 
 
 
-      {/* Stats Cards */}
+
+      {/* Stats */}
 
       <div
         className="
@@ -106,18 +126,70 @@ export default function DashboardPage() {
 
       </div>
 
-        {/* Threat Chart */}
-        <ThreatChart />
+      
 
-        {/* Recent Alerts */}
-        <RecentAlerts />
 
-        {/* AI Summary */}
+
+
+
+      {/* Threat Chart */}
+
+      <ThreatChart />
+
+
+
+
+
+      {/* Alerts */}
+
+      <RecentAlerts />
+
+
+
+
+
+      {/* AI + Health */}
+
+      <div
+        className="
+        grid
+        gap-6
+        xl:grid-cols-2
+        "
+      >
+
         <AISummary />
 
-        {/* Health Card */}
-        <HealthCard />     
+        <HealthCard />
 
+        {/* Global Threat Monitoring */}
+
+        <ThreatAnalytics />
+
+<div
+  className="
+  grid
+  gap-6
+  xl:grid-cols-2
+  "
+>
+
+  <AttackMap />
+
+  <LiveThreatFeed />
+
+</div>
+
+
+      </div>
+
+      {/* IP Checker */}
+
+      <IPChecker />
+
+      {/* Threat Scan History */}
+
+      <ThreatScanHistory />
 
     </div>
 
