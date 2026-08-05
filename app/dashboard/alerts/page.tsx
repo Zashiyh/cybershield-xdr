@@ -1,5 +1,7 @@
 "use client";
+
 import { toast } from "sonner";
+
 import {
   useEffect,
   useState
@@ -16,17 +18,26 @@ import {
 interface Alert {
 
   _id:string;
+
   title:string;
+
   ip:string;
+
   severity:string;
+
   status:string;
+
   score:number;
+
   description:string;
+
   createdAt:string;
 
-  incidentCreated?:boolean;
+  incidentId?:string;
 
 }
+
+
 
 
 
@@ -52,8 +63,11 @@ useState("");
 const [severity,setSeverity] =
 useState("ALL");
 
+
 const [creating,setCreating] =
 useState<string | null>(null);
+
+
 
 
 
@@ -98,7 +112,6 @@ data
 
 
 
-
 setAlerts(list);
 
 setFiltered(list);
@@ -106,63 +119,6 @@ setFiltered(list);
 
 
 }
-catch(error){
-
-console.log(error);
-
-}
-
-
-}
-
-
-
-
-
-
-
-
-async function updateStatus(
-id:string,
-status:string
-){
-
-
-try{
-
-
-await fetch(
-
-`/api/security/alerts/${id}`,
-
-{
-
-method:"PATCH",
-
-headers:{
-
-"Content-Type":
-"application/json"
-
-},
-
-body:JSON.stringify({
-
-status
-
-})
-
-}
-
-);
-
-
-
-loadAlerts();
-
-
-
-}
 
 catch(error){
 
@@ -172,6 +128,8 @@ console.log(error);
 
 
 }
+
+
 
 
 
@@ -182,6 +140,7 @@ console.log(error);
 async function createIncident(
 alert:Alert
 ){
+
 
 try{
 
@@ -226,6 +185,13 @@ await res.json();
 
 
 
+console.log(
+"INCIDENT RESPONSE",
+data
+);
+
+
+
 if(res.ok){
 
 
@@ -234,29 +200,37 @@ toast.success(
 );
 
 
-setAlerts(prev=>
 
-prev.map(item=>
+setAlerts(prev =>
 
-item._id===alert._id
+prev.map(item =>
+
+
+item._id === alert._id
 
 ?
 
 {
+
 ...item,
-incidentCreated:true
+
+incidentId:data._id
+
 }
 
 :
 
 item
 
+
 )
 
 );
 
 
+
 }
+
 
 else{
 
@@ -269,11 +243,14 @@ data.message || "Failed"
 }
 
 
+
 }
 
 catch(error){
 
+
 console.log(error);
+
 
 toast.error(
 "Incident creation failed"
@@ -284,12 +261,18 @@ toast.error(
 
 finally{
 
+
 setCreating(null);
 
+
 }
 
 
 }
+
+
+
+
 
 
 
@@ -322,6 +305,8 @@ search.toLowerCase()
 
 
 }
+
+
 
 
 
@@ -359,9 +344,14 @@ alerts
 
 
 
+
+
+
 return (
 
 <div className="space-y-6">
+
+
 
 
 
@@ -402,25 +392,6 @@ gap-4
 ">
 
 
-<div className="
-flex-1
-flex
-items-center
-gap-3
-rounded-xl
-border
-border-slate-800
-bg-[#0f172a]
-px-4
-">
-
-
-<Search
-size={18}
-className="text-slate-400"
-/>
-
-
 
 <input
 
@@ -434,18 +405,18 @@ e.target.value
 )
 }
 
+
 className="
-w-full
-bg-transparent
+flex-1
+rounded-xl
+bg-[#0f172a]
+border
+border-slate-800
 p-3
 text-white
-outline-none
 "
 
 />
-
-
-</div>
 
 
 
@@ -461,28 +432,33 @@ e.target.value
 )
 }
 
+
 className="
 rounded-xl
+bg-[#0f172a]
 border
 border-slate-800
-bg-[#0f172a]
 px-5
 text-white
 "
 
 >
 
+
 <option value="ALL">
 ALL
 </option>
+
 
 <option value="HIGH">
 HIGH
 </option>
 
+
 <option value="MEDIUM">
 MEDIUM
 </option>
+
 
 <option value="LOW">
 LOW
@@ -501,13 +477,12 @@ LOW
 
 
 
-
 <div className="
-overflow-hidden
 rounded-2xl
 border
 border-slate-800
 bg-black
+overflow-hidden
 ">
 
 
@@ -524,7 +499,6 @@ text-slate-400
 
 
 <tr>
-
 
 <th className="p-4">
 Alert
@@ -543,11 +517,6 @@ Severity
 
 <th className="p-4">
 Score
-</th>
-
-
-<th className="p-4">
-Status
 </th>
 
 
@@ -575,7 +544,7 @@ Time
 
 {
 
-filtered.map((alert)=>(
+filtered.map(alert=>(
 
 
 <tr
@@ -589,8 +558,8 @@ text-white
 hover:bg-slate-900
 "
 
->
 
+>
 
 
 
@@ -608,8 +577,8 @@ onClick={()=>setSelected(alert)}
 size={18}
 
 className="
-mr-2
 inline
+mr-2
 text-red-400
 "
 
@@ -637,9 +606,7 @@ text-red-400
 
 <td className="p-4">
 
-
 {alert.severity}
-
 
 </td>
 
@@ -657,72 +624,54 @@ text-red-400
 
 
 
-<td className="p-4">
-
-
-<select
-
-value={alert.status}
-
-onClick={(e)=>
-e.stopPropagation()
-}
-
-onChange={
-e=>
-updateStatus(
-alert._id,
-e.target.value
-)
-}
-
-className="
-rounded-lg
-bg-[#020617]
-border
-border-slate-700
-px-3
-py-2
-"
-
->
-
-
-<option value="OPEN">
-OPEN
-</option>
-
-
-<option value="INVESTIGATING">
-INVESTIGATING
-</option>
-
-
-<option value="RESOLVED">
-RESOLVED
-</option>
-
-
-</select>
-
-
-</td>
-
-
-
-
-
-
 
 <td className="p-4">
+
+
+
+{
+
+alert.incidentId
+
+?
 
 
 <button
 
-type="button"
+onClick={(e)=>{
+
+e.stopPropagation();
+
+
+window.location.href =
+`/dashboard/incidents/${alert.incidentId}`;
+
+
+}}
+
+className="
+rounded-lg
+bg-cyan-500
+px-3
+py-2
+text-xs
+font-bold
+text-black
+"
+
+>
+
+View Incident
+
+</button>
+
+
+:
+
+
+<button
 
 disabled={
-alert.incidentCreated ||
 creating===alert._id
 }
 
@@ -734,40 +683,19 @@ createIncident(alert);
 
 }}
 
-className={`
-
+className="
 rounded-lg
+bg-red-500
 px-3
 py-2
 text-xs
 font-bold
-
-${
-alert.incidentCreated
-
-?
-
-"bg-green-500 text-black"
-
-:
-
-"bg-red-500 text-white"
-
-}
-
-`}
+text-white
+"
 
 >
 
 {
-
-alert.incidentCreated
-
-?
-
-"Incident Created"
-
-:
 
 creating===alert._id
 
@@ -784,6 +712,10 @@ creating===alert._id
 
 </button>
 
+
+}
+
+
 </td>
 
 
@@ -791,14 +723,20 @@ creating===alert._id
 
 
 
-<td className="p-4 text-slate-400">
+
+<td className="
+p-4
+text-slate-400
+">
 
 
-<Clock size={14} className="inline"/>
+<Clock
+size={14}
+className="inline"
+/>
 
 
 {" "}
-
 
 {
 new Date(
@@ -809,6 +747,7 @@ alert.createdAt
 
 
 </td>
+
 
 
 
@@ -825,7 +764,6 @@ alert.createdAt
 </tbody>
 
 
-
 </table>
 
 
@@ -837,9 +775,8 @@ alert.createdAt
 
 
 
-
-
 {
+
 selected &&
 
 <div className="
@@ -854,20 +791,19 @@ bg-black/70
 
 
 <div className="
-w-full
-max-w-lg
-rounded-2xl
+bg-[#0f172a]
 border
 border-slate-700
-bg-[#0f172a]
+rounded-xl
 p-6
+w-full
+max-w-lg
 ">
 
 
 <div className="
 flex
 justify-between
-mb-6
 ">
 
 
@@ -882,11 +818,12 @@ Alert Details
 </h2>
 
 
-
 <button
+
 onClick={()=>
 setSelected(null)
 }
+
 >
 
 <X className="text-white"/>
@@ -900,7 +837,8 @@ setSelected(null)
 
 
 <div className="
-space-y-4
+mt-5
+space-y-3
 text-slate-300
 ">
 
@@ -925,16 +863,6 @@ Score: {selected.score}/100
 </p>
 
 
-<p>
-Status: {selected.status}
-</p>
-
-
-<p>
-{selected.description}
-</p>
-
-
 </div>
 
 
@@ -942,13 +870,13 @@ Status: {selected.status}
 
 
 </div>
+
 
 }
 
 
 
 </div>
-
 
 );
 

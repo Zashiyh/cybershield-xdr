@@ -15,9 +15,13 @@ export interface IAlert extends Document {
 
   description:string;
 
+  incidentId?:string;
+
   createdAt:Date;
 
 }
+
+
 
 
 
@@ -35,6 +39,7 @@ required:true
 },
 
 
+
 ip:{
 
 type:String,
@@ -44,6 +49,7 @@ required:true
 },
 
 
+
 severity:{
 
 type:String,
@@ -51,12 +57,17 @@ type:String,
 required:true,
 
 enum:[
+
 "HIGH",
+
 "MEDIUM",
+
 "LOW"
+
 ]
 
 },
+
 
 
 status:{
@@ -68,6 +79,7 @@ default:"OPEN"
 },
 
 
+
 score:{
 
 type:Number,
@@ -77,13 +89,27 @@ default:0
 },
 
 
+
 description:{
 
 type:String,
 
 default:""
 
+},
+
+
+
+// Link alert with incident
+
+incidentId:{
+
+type:String,
+
+default:null
+
 }
+
 
 
 },
@@ -98,11 +124,16 @@ timestamps:true
 
 
 
+
+
 export default
 
 mongoose.models.Alert ||
 
 mongoose.model<IAlert>(
+
 "Alert",
+
 AlertSchema
+
 );

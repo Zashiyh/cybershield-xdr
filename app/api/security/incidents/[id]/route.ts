@@ -14,6 +14,7 @@ import Incident from "@/models/Incident";
 
 
 
+
 export async function GET(
 
 req:NextRequest,
@@ -34,34 +35,16 @@ try{
 
 await connectDB();
 
-const body =
-await req.json();
+
 
 const incident =
+
 await Incident.findById(
 params.id
 );
 
-const existing =
-await Incident.findOne({
-
-alertId:body.alertId
-
-});
 
 
-if(existing){
-
-return NextResponse.json(
-{
-message:"Incident already exists"
-},
-{
-status:400
-}
-);
-
-}
 
 if(!incident){
 
@@ -78,6 +61,8 @@ status:404
 
 
 
+
+
 return NextResponse.json(
 incident
 );
@@ -86,6 +71,7 @@ incident
 
 }
 catch(error){
+
 
 console.log(error);
 
@@ -102,7 +88,9 @@ status:500
 
 }
 
+
 }
+
 
 
 
@@ -137,15 +125,16 @@ await req.json();
 
 
 
+
 const updated =
+
 await Incident.findByIdAndUpdate(
 
 params.id,
 
 {
 
-status:
-body.status
+status:body.status
 
 },
 
@@ -154,6 +143,23 @@ new:true
 }
 
 );
+
+
+
+
+if(!updated){
+
+return NextResponse.json(
+{
+message:"Incident not found"
+},
+{
+status:404
+}
+);
+
+}
+
 
 
 
@@ -167,6 +173,10 @@ updated
 catch(error){
 
 
+console.log(error);
+
+
+
 return NextResponse.json(
 {
 message:"Update failed"
@@ -178,5 +188,6 @@ status:500
 
 
 }
+
 
 }
