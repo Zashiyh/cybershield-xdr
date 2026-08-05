@@ -188,7 +188,7 @@ label
 
 {
 
-data.riskData.map(
+(data?.riskData ?? []).map(
 (item:any,index:number)=>(
 
 

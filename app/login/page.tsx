@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 
 
 export default function LoginPage() {
@@ -91,10 +92,12 @@ export default function LoginPage() {
         max-w-md
         rounded-xl
         border
+        border-slate-800
         bg-[#0f172a]
         p-8
         "
       >
+
 
         <h1
           className="
@@ -107,9 +110,23 @@ export default function LoginPage() {
         </h1>
 
 
+        <p
+          className="
+          mt-2
+          text-slate-400
+          "
+        >
+          Security Operations Center Login
+        </p>
+
+
+
+
         <input
 
           placeholder="Email"
+
+          type="email"
 
           className="
           mt-6
@@ -117,7 +134,10 @@ export default function LoginPage() {
           rounded-lg
           bg-black/30
           p-3
+          text-white
           outline-none
+          border
+          border-slate-700
           "
 
           value={email}
@@ -127,6 +147,9 @@ export default function LoginPage() {
           }
 
         />
+
+
+
 
 
         <input
@@ -141,7 +164,10 @@ export default function LoginPage() {
           rounded-lg
           bg-black/30
           p-3
+          text-white
           outline-none
+          border
+          border-slate-700
           "
 
           value={password}
@@ -151,6 +177,9 @@ export default function LoginPage() {
           }
 
         />
+
+
+
 
 
         <button
@@ -165,6 +194,8 @@ export default function LoginPage() {
           p-3
           font-bold
           text-black
+          hover:bg-cyan-400
+          transition
           "
 
         >
@@ -174,7 +205,48 @@ export default function LoginPage() {
         </button>
 
 
+
+
+
+        <div
+
+          className="
+          mt-5
+          text-center
+          text-sm
+          text-slate-400
+          "
+
+        >
+
+          Don't have an account?
+
+
+          <Link
+
+            href="/register"
+
+            className="
+            ml-2
+            font-semibold
+            text-cyan-400
+            hover:underline
+            "
+
+          >
+
+            Create Account
+
+          </Link>
+
+
+        </div>
+
+
+
+
       </div>
+
 
     </div>
 

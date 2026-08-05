@@ -18,6 +18,12 @@ export interface IAsset extends Document {
 
   risk:string;
 
+  riskScore:number;
+
+  alertCount:number;
+
+  lastThreat?:Date;
+
   lastSeen:Date;
 
 }
@@ -50,6 +56,8 @@ unique:true
 },
 
 
+
+
 os:{
 
 type:String,
@@ -68,6 +76,8 @@ required:true
 },
 
 
+
+
 status:{
 
 type:String,
@@ -77,6 +87,8 @@ default:"Online"
 },
 
 
+
+
 risk:{
 
 type:String,
@@ -84,6 +96,38 @@ type:String,
 default:"LOW"
 
 },
+
+
+
+riskScore:{
+
+type:Number,
+
+default:0
+
+},
+
+
+
+alertCount:{
+
+type:Number,
+
+default:0
+
+},
+
+
+
+lastThreat:{
+
+type:Date,
+
+default:null
+
+},
+
+
 
 
 lastSeen:{
@@ -96,6 +140,7 @@ default:Date.now
 
 
 },
+
 
 {
 

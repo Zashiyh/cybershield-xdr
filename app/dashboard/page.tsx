@@ -5,12 +5,18 @@ import ThreatChart from "@/components/dashboard/threat-chart";
 import RecentAlerts from "@/components/dashboard/recent-alerts";
 import AISummary from "@/components/dashboard/ai-summary";
 import HealthCard from "@/components/dashboard/health-card";
-import AttackMap from "@/components/dashboard/attack-map";
 import LiveThreatFeed from "@/components/dashboard/live-threat-feed";
 import IPChecker from "@/components/security/ip-checker";
 import ThreatScanHistory from "@/components/dashboard/threat-scan-history";
 import ThreatAnalytics from "@/components/dashboard/threat-analytics";
+import dynamic from "next/dynamic";
 
+const AttackMap = dynamic(
+  () => import("@/components/dashboard/attack-map"),
+  {
+    ssr: false,
+  }
+);
 import {
   ShieldAlert,
   TriangleAlert,
