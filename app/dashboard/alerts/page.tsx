@@ -1,5 +1,5 @@
 "use client";
-
+import { toast } from "sonner";
 import {
   useEffect,
   useState
@@ -23,6 +23,8 @@ interface Alert {
   score:number;
   description:string;
   createdAt:string;
+
+  incidentCreated?:boolean;
 
 }
 
@@ -50,6 +52,8 @@ useState("");
 const [severity,setSeverity] =
 useState("ALL");
 
+const [creating,setCreating] =
+useState<string | null>(null);
 
 
 
@@ -58,6 +62,8 @@ useEffect(()=>{
 loadAlerts();
 
 },[]);
+
+
 
 
 
@@ -77,13 +83,25 @@ cache:"no-store"
 );
 
 
+
 const data =
 await res.json();
 
 
-setAlerts(data);
 
-setFiltered(data);
+const list =
+Array.isArray(data)
+?
+data
+:
+[];
+
+
+
+
+setAlerts(list);
+
+setFiltered(list);
 
 
 
@@ -96,6 +114,9 @@ console.log(error);
 
 
 }
+
+
+
 
 
 
@@ -156,6 +177,125 @@ console.log(error);
 
 
 
+
+
+async function createIncident(
+alert:Alert
+){
+
+try{
+
+
+setCreating(alert._id);
+
+
+
+const res =
+await fetch(
+"/api/security/incidents",
+{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+
+title:alert.title,
+
+alertId:alert._id,
+
+ip:alert.ip,
+
+severity:alert.severity,
+
+description:alert.description
+
+})
+
+}
+
+);
+
+
+
+const data =
+await res.json();
+
+
+
+if(res.ok){
+
+
+toast.success(
+"Incident Created Successfully"
+);
+
+
+setAlerts(prev=>
+
+prev.map(item=>
+
+item._id===alert._id
+
+?
+
+{
+...item,
+incidentCreated:true
+}
+
+:
+
+item
+
+)
+
+);
+
+
+}
+
+else{
+
+
+toast.error(
+data.message || "Failed"
+);
+
+
+}
+
+
+}
+
+catch(error){
+
+console.log(error);
+
+toast.error(
+"Incident creation failed"
+);
+
+
+}
+
+finally{
+
+setCreating(null);
+
+}
+
+
+}
+
+
+
+
+
+
 useEffect(()=>{
 
 
@@ -205,11 +345,14 @@ alert.severity === severity
 setFiltered(data);
 
 
+
 },[
 search,
 severity,
 alerts
 ]);
+
+
 
 
 
@@ -246,6 +389,8 @@ Monitor detected security threats
 
 
 </div>
+
+
 
 
 
@@ -327,19 +472,19 @@ text-white
 
 >
 
-<option>
+<option value="ALL">
 ALL
 </option>
 
-<option>
+<option value="HIGH">
 HIGH
 </option>
 
-<option>
+<option value="MEDIUM">
 MEDIUM
 </option>
 
-<option>
+<option value="LOW">
 LOW
 </option>
 
@@ -347,8 +492,9 @@ LOW
 </select>
 
 
-
 </div>
+
+
 
 
 
@@ -379,25 +525,36 @@ text-slate-400
 
 <tr>
 
+
 <th className="p-4">
 Alert
 </th>
+
 
 <th className="p-4">
 IP
 </th>
 
+
 <th className="p-4">
 Severity
 </th>
+
 
 <th className="p-4">
 Score
 </th>
 
+
 <th className="p-4">
 Status
 </th>
+
+
+<th className="p-4">
+Action
+</th>
+
 
 <th className="p-4">
 Time
@@ -405,6 +562,7 @@ Time
 
 
 </tr>
+
 
 </thead>
 
@@ -432,6 +590,7 @@ hover:bg-slate-900
 "
 
 >
+
 
 
 
@@ -465,6 +624,7 @@ text-red-400
 
 
 
+
 <td className="p-4">
 
 {alert.ip}
@@ -474,47 +634,15 @@ text-red-400
 
 
 
+
 <td className="p-4">
 
 
-<span className={`
-
-rounded-full
-px-3
-py-1
-text-xs
-font-bold
-
-
-${
-alert.severity==="HIGH"
-
-?
-
-"bg-red-500/20 text-red-400"
-
-:
-
-alert.severity==="MEDIUM"
-
-?
-
-"bg-yellow-500/20 text-yellow-400"
-
-:
-
-"bg-green-500/20 text-green-400"
-
-}
-
-`}>
-
 {alert.severity}
-
-</span>
 
 
 </td>
+
 
 
 
@@ -540,7 +668,6 @@ onClick={(e)=>
 e.stopPropagation()
 }
 
-
 onChange={
 e=>
 updateStatus(
@@ -549,17 +676,14 @@ e.target.value
 )
 }
 
-
 className="
 rounded-lg
+bg-[#020617]
 border
 border-slate-700
-bg-[#020617]
 px-3
 py-2
-text-white
 "
-
 
 >
 
@@ -588,16 +712,93 @@ RESOLVED
 
 
 
+
+
+<td className="p-4">
+
+
+<button
+
+type="button"
+
+disabled={
+alert.incidentCreated ||
+creating===alert._id
+}
+
+onClick={(e)=>{
+
+e.stopPropagation();
+
+createIncident(alert);
+
+}}
+
+className={`
+
+rounded-lg
+px-3
+py-2
+text-xs
+font-bold
+
+${
+alert.incidentCreated
+
+?
+
+"bg-green-500 text-black"
+
+:
+
+"bg-red-500 text-white"
+
+}
+
+`}
+
+>
+
+{
+
+alert.incidentCreated
+
+?
+
+"Incident Created"
+
+:
+
+creating===alert._id
+
+?
+
+"Creating..."
+
+:
+
+"Create Incident"
+
+}
+
+
+</button>
+
+</td>
+
+
+
+
+
+
 <td className="p-4 text-slate-400">
 
 
-<Clock
-size={14}
-className="inline"
-/>
+<Clock size={14} className="inline"/>
 
 
 {" "}
+
 
 {
 new Date(
@@ -616,10 +817,13 @@ alert.createdAt
 
 ))
 
+
 }
 
 
+
 </tbody>
+
 
 
 </table>
@@ -638,9 +842,7 @@ alert.createdAt
 {
 selected &&
 
-<div
-
-className="
+<div className="
 fixed
 inset-0
 z-50
@@ -648,10 +850,7 @@ flex
 items-center
 justify-center
 bg-black/70
-"
-
-
->
+">
 
 
 <div className="
@@ -666,9 +865,9 @@ p-6
 
 
 <div className="
-mb-6
 flex
 justify-between
+mb-6
 ">
 
 
@@ -683,12 +882,11 @@ Alert Details
 </h2>
 
 
-<button
 
+<button
 onClick={()=>
 setSelected(null)
 }
-
 >
 
 <X className="text-white"/>
@@ -737,7 +935,6 @@ Status: {selected.status}
 </p>
 
 
-
 </div>
 
 
@@ -751,6 +948,7 @@ Status: {selected.status}
 
 
 </div>
+
 
 );
 
