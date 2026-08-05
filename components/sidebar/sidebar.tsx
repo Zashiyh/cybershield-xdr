@@ -1,6 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import {
+  useEffect,
+  useState
+} from "react";
+
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -19,64 +23,66 @@ import {
 } from "lucide-react";
 
 
+
 const menu = [
 
   {
-    name:"Dashboard",
-    href:"/dashboard",
-    icon:LayoutDashboard,
+    name: "Dashboard",
+    href: "/dashboard",
+    icon: LayoutDashboard,
   },
 
   {
-    name:"Threat Monitor",
-    href:"/dashboard/threats",
-    icon:Shield,
+    name: "Threat Monitor",
+    href: "/dashboard/threats",
+    icon: Shield,
   },
 
   {
-    name:"Alerts",
-    href:"/dashboard/alerts",
-    icon:Radar,
-    badge:12,
+    name: "Alerts",
+    href: "/dashboard/alerts",
+    icon: Radar,
   },
 
   {
-    name:"Incidents",
-    href:"/dashboard/incidents",
-    icon:Activity,
+    name: "Incidents",
+    href: "/dashboard/incidents",
+    icon: Activity,
   },
 
   {
-    name:"Threat Intelligence",
-    href:"/dashboard/intelligence",
-    icon:Globe,
+    name: "Threat Intelligence",
+    href: "/dashboard/intelligence",
+    icon: Globe,
   },
 
   {
-    name:"Assets",
-    href:"/dashboard/assets",
-    icon:Server,
+    name: "Assets",
+    href: "/dashboard/assets",
+    icon: Server,
   },
 
   {
-    name:"Reports",
-    href:"/dashboard/reports",
-    icon:FileText,
+    name: "Reports",
+    href: "/dashboard/reports",
+    icon: FileText,
   },
 
   {
-    name:"Users",
-    href:"/dashboard/users",
-    icon:Users,
+    name: "Users",
+    href: "/dashboard/users",
+    icon: Users,
   },
 
   {
-    name:"Settings",
-    href:"/dashboard/settings",
-    icon:Settings,
+    name: "Settings",
+    href: "/dashboard/settings",
+    icon: Settings,
   },
 
 ];
+
+
 
 
 
@@ -86,8 +92,88 @@ export default function Sidebar(){
 const pathname = usePathname();
 
 
+
 const [collapsed,setCollapsed] =
 useState(false);
+
+
+
+const [alertCount,setAlertCount] =
+useState(0);
+
+
+
+
+
+
+useEffect(()=>{
+
+
+async function getAlertCount(){
+
+
+try{
+
+
+const res =
+await fetch(
+"/api/security/alerts/count",
+{
+cache:"no-store"
+}
+);
+
+
+
+const data =
+await res.json();
+
+
+
+setAlertCount(
+data.count || 0
+);
+
+
+
+}
+
+catch(error){
+
+console.log(
+"ALERT COUNT ERROR",
+error
+);
+
+
+}
+
+
+}
+
+
+
+getAlertCount();
+
+
+
+const interval =
+setInterval(
+getAlertCount,
+30000
+);
+
+
+
+return()=>clearInterval(interval);
+
+
+
+},[]);
+
+
+
+
 
 
 
@@ -96,21 +182,32 @@ return (
 <aside
 
 className={`
+
 h-screen
+
 ${collapsed ? "w-24" : "w-72"}
+
 flex
+
 flex-col
-bg-[#0B1120]
+
 border-r
+
 border-slate-800
+
+bg-[#0B1120]
+
 transition-all
+
 duration-300
-`
 
-}
+overflow-hidden
 
+`}
 
 >
+
+
 
 
 
@@ -131,6 +228,7 @@ p-5
 
 
 {
+
 !collapsed &&
 
 <div>
@@ -144,7 +242,9 @@ text-cyan-400
 "
 
 >
+
 CyberShield
+
 </h1>
 
 
@@ -156,7 +256,9 @@ text-slate-400
 "
 
 >
+
 XDR Platform
+
 </p>
 
 
@@ -166,11 +268,10 @@ XDR Platform
 
 
 
+
 <button
 
-onClick={()=>
-setCollapsed(!collapsed)
-}
+onClick={()=>setCollapsed(!collapsed)}
 
 className="
 rounded-lg
@@ -182,6 +283,7 @@ hover:bg-slate-800
 
 
 {
+
 collapsed
 
 ?
@@ -198,6 +300,7 @@ collapsed
 </button>
 
 
+
 </div>
 
 
@@ -205,14 +308,17 @@ collapsed
 
 
 
-{/* Navigation */}
+
+
+
+{/* Menu */}
 
 <nav
 
 className="
 flex-1
-overflow-y-auto
 space-y-2
+overflow-y-auto
 p-3
 "
 
@@ -220,11 +326,13 @@ p-3
 
 
 {
+
 menu.map((item)=>{
 
 
 const Icon =
 item.icon;
+
 
 
 const active =
@@ -244,11 +352,17 @@ href={item.href}
 className={`
 
 flex
+
 items-center
+
 justify-between
+
 rounded-xl
+
 px-4
+
 py-3
+
 transition
 
 
@@ -287,7 +401,9 @@ gap-3
 
 
 
+
 {
+
 !collapsed &&
 
 <span>
@@ -299,7 +415,9 @@ gap-3
 }
 
 
+
 </div>
+
 
 
 
@@ -308,10 +426,9 @@ gap-3
 
 {
 !collapsed &&
-item.badge &&
+item.name === "Alerts" &&
 
 <span
-
 className="
 rounded-full
 bg-red-500
@@ -320,11 +437,8 @@ py-1
 text-xs
 text-white
 "
-
 >
-
-{item.badge}
-
+{alertCount}
 </span>
 
 }
@@ -334,7 +448,7 @@ text-white
 </Link>
 
 
-)
+);
 
 
 })
@@ -342,7 +456,11 @@ text-white
 }
 
 
+
 </nav>
+
+
+
 
 
 
@@ -404,7 +522,14 @@ Version 1.0.0
 
 :
 
-<div className="flex justify-center">
+<div
+
+className="
+flex
+justify-center
+"
+
+>
 
 <Shield
 
@@ -416,13 +541,17 @@ text-cyan-400
 
 />
 
+
 </div>
 
 
 }
 
 
+
 </div>
+
+
 
 
 

@@ -13,23 +13,15 @@ import {
 } from "lucide-react";
 
 
-
 interface Alert {
 
   _id:string;
-
   title:string;
-
   ip:string;
-
   severity:string;
-
   status:string;
-
   score:number;
-
   description:string;
-
   createdAt:string;
 
 }
@@ -51,10 +43,8 @@ const [selected,setSelected] =
 useState<Alert | null>(null);
 
 
-
 const [search,setSearch] =
 useState("");
-
 
 
 const [severity,setSeverity] =
@@ -63,15 +53,11 @@ useState("ALL");
 
 
 
-
 useEffect(()=>{
-
 
 loadAlerts();
 
-
 },[]);
-
 
 
 
@@ -91,15 +77,67 @@ cache:"no-store"
 );
 
 
-
 const data =
 await res.json();
-
 
 
 setAlerts(data);
 
 setFiltered(data);
+
+
+
+}
+catch(error){
+
+console.log(error);
+
+}
+
+
+}
+
+
+
+
+
+async function updateStatus(
+id:string,
+status:string
+){
+
+
+try{
+
+
+await fetch(
+
+`/api/security/alerts/${id}`,
+
+{
+
+method:"PATCH",
+
+headers:{
+
+"Content-Type":
+"application/json"
+
+},
+
+body:JSON.stringify({
+
+status
+
+})
+
+}
+
+);
+
+
+
+loadAlerts();
 
 
 
@@ -118,7 +156,6 @@ console.log(error);
 
 
 
-
 useEffect(()=>{
 
 
@@ -132,6 +169,7 @@ if(search){
 
 data =
 data.filter(
+
 (alert)=>
 
 alert.ip
@@ -147,13 +185,12 @@ search.toLowerCase()
 
 
 
-
-
 if(severity !== "ALL"){
 
 
 data =
 data.filter(
+
 (alert)=>
 
 alert.severity === severity
@@ -168,7 +205,6 @@ alert.severity === severity
 setFiltered(data);
 
 
-
 },[
 search,
 severity,
@@ -180,46 +216,29 @@ alerts
 
 
 
-
-
 return (
 
-<div
-
-className="
-space-y-6
-"
-
->
+<div className="space-y-6">
 
 
 
 <div>
 
-
-<h1
-
-className="
+<h1 className="
 text-4xl
 font-bold
 text-white
-"
-
->
+">
 
 Security Alerts
 
 </h1>
 
 
-<p
-
-className="
-text-slate-400
+<p className="
 mt-2
-"
-
->
+text-slate-400
+">
 
 Monitor detected security threats
 
@@ -232,40 +251,30 @@ Monitor detected security threats
 
 
 
-
-
-
-<div
-
-className="
+<div className="
 flex
 gap-4
-"
-
->
+">
 
 
-<div
-
-className="
+<div className="
 flex-1
 flex
 items-center
 gap-3
 rounded-xl
-bg-[#0f172a]
 border
 border-slate-800
+bg-[#0f172a]
 px-4
-"
-
->
+">
 
 
 <Search
 size={18}
 className="text-slate-400"
 />
+
 
 
 <input
@@ -279,7 +288,6 @@ e=>setSearch(
 e.target.value
 )
 }
-
 
 className="
 w-full
@@ -308,35 +316,30 @@ e.target.value
 )
 }
 
-
 className="
 rounded-xl
-bg-[#0f172a]
 border
 border-slate-800
+bg-[#0f172a]
 px-5
 text-white
 "
 
 >
 
-
-<option value="ALL">
+<option>
 ALL
 </option>
 
-
-<option value="HIGH">
+<option>
 HIGH
 </option>
 
-
-<option value="MEDIUM">
+<option>
 MEDIUM
 </option>
 
-
-<option value="LOW">
+<option>
 LOW
 </option>
 
@@ -353,38 +356,25 @@ LOW
 
 
 
-
-<div
-
-className="
+<div className="
+overflow-hidden
 rounded-2xl
 border
 border-slate-800
 bg-black
-overflow-hidden
-"
-
->
+">
 
 
-<table
-
-className="
+<table className="
 w-full
 text-left
-"
-
->
+">
 
 
-<thead
-
-className="
+<thead className="
 bg-[#0f172a]
 text-slate-400
-"
-
->
+">
 
 
 <tr>
@@ -406,11 +396,15 @@ Score
 </th>
 
 <th className="p-4">
+Status
+</th>
+
+<th className="p-4">
 Time
 </th>
 
-</tr>
 
+</tr>
 
 </thead>
 
@@ -423,18 +417,14 @@ Time
 
 {
 
-filtered.map(
-(alert)=>(
+filtered.map((alert)=>(
 
 
 <tr
 
 key={alert._id}
 
-onClick={()=>setSelected(alert)}
-
 className="
-cursor-pointer
 border-t
 border-slate-800
 text-white
@@ -444,15 +434,23 @@ hover:bg-slate-900
 >
 
 
-<td className="p-4">
+
+<td
+
+className="p-4 cursor-pointer"
+
+onClick={()=>setSelected(alert)}
+
+>
+
 
 <ShieldAlert
 
 size={18}
 
 className="
-inline
 mr-2
+inline
 text-red-400
 "
 
@@ -476,13 +474,10 @@ text-red-400
 
 
 
-
 <td className="p-4">
 
 
-<span
-
-className={`
+<span className={`
 
 rounded-full
 px-3
@@ -512,14 +507,9 @@ alert.severity==="MEDIUM"
 
 }
 
-
-`}
-
->
-
+`}>
 
 {alert.severity}
-
 
 </span>
 
@@ -529,10 +519,68 @@ alert.severity==="MEDIUM"
 
 
 
-
 <td className="p-4">
 
 {alert.score}/100
+
+</td>
+
+
+
+
+
+<td className="p-4">
+
+
+<select
+
+value={alert.status}
+
+onClick={(e)=>
+e.stopPropagation()
+}
+
+
+onChange={
+e=>
+updateStatus(
+alert._id,
+e.target.value
+)
+}
+
+
+className="
+rounded-lg
+border
+border-slate-700
+bg-[#020617]
+px-3
+py-2
+text-white
+"
+
+
+>
+
+
+<option value="OPEN">
+OPEN
+</option>
+
+
+<option value="INVESTIGATING">
+INVESTIGATING
+</option>
+
+
+<option value="RESOLVED">
+RESOLVED
+</option>
+
+
+</select>
+
 
 </td>
 
@@ -566,15 +614,12 @@ alert.createdAt
 </tr>
 
 
-)
-
-)
+))
 
 }
 
 
 </tbody>
-
 
 
 </table>
@@ -588,9 +633,10 @@ alert.createdAt
 
 
 
-{
-selected && (
 
+
+{
+selected &&
 
 <div
 
@@ -604,12 +650,11 @@ justify-center
 bg-black/70
 "
 
+
 >
 
 
-<div
-
-className="
+<div className="
 w-full
 max-w-lg
 rounded-2xl
@@ -617,31 +662,21 @@ border
 border-slate-700
 bg-[#0f172a]
 p-6
-"
-
->
+">
 
 
-<div
-
-className="
+<div className="
+mb-6
 flex
 justify-between
-mb-6
-"
-
->
+">
 
 
-<h2
-
-className="
+<h2 className="
 text-xl
 font-bold
 text-white
-"
-
->
+">
 
 Alert Details
 
@@ -656,9 +691,7 @@ setSelected(null)
 
 >
 
-<X
-className="text-white"
-/>
+<X className="text-white"/>
 
 </button>
 
@@ -668,62 +701,42 @@ className="text-white"
 
 
 
-
-<div
-
-className="
+<div className="
 space-y-4
 text-slate-300
-"
-
->
+">
 
 
 <p>
-Title:
-{" "}
-{selected.title}
+Title: {selected.title}
 </p>
 
 
 <p>
-IP:
-{" "}
-{selected.ip}
+IP: {selected.ip}
 </p>
 
 
 <p>
-Severity:
-{" "}
-{selected.severity}
+Severity: {selected.severity}
 </p>
 
 
 <p>
-Threat Score:
-{" "}
-{selected.score}/100
+Score: {selected.score}/100
 </p>
 
 
 <p>
-Status:
-{" "}
-{selected.status}
+Status: {selected.status}
 </p>
 
 
 <p>
-Description:
-{" "}
 {selected.description}
 </p>
 
 
-</div>
-
-
 
 </div>
 
@@ -731,7 +744,7 @@ Description:
 </div>
 
 
-)
+</div>
 
 }
 
