@@ -31,12 +31,26 @@ interface AttackLocation {
 
   city:string;
 
+  targetLat:number;
+
+  targetLng:number;
+
 }
 
 
 
 const geoUrl =
 "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
+
+
+
+const SOC_LOCATION = {
+
+  lat:6.9271,
+
+  lng:79.8612
+
+};
 
 
 
@@ -53,6 +67,7 @@ const [loading,setLoading] =
 useState(true);
 
 
+
 const [selectedAttack,setSelectedAttack] =
 useState<AttackLocation | null>(null);
 
@@ -60,13 +75,14 @@ useState<AttackLocation | null>(null);
 
 
 
-useEffect(()=>{
 
+
+useEffect(()=>{
 
 loadAttackLocations();
 
-
 },[]);
+
 
 
 
@@ -80,7 +96,7 @@ async function loadAttackLocations(){
 try{
 
 
-const alertRes =
+const res =
 await fetch(
 
 "/api/security/alerts",
@@ -94,19 +110,16 @@ cache:"no-store"
 
 
 const alerts =
-await alertRes.json();
-
+await res.json();
 
 
 
 
 if(!Array.isArray(alerts)){
 
-
 setLoading(false);
 
 return;
-
 
 }
 
@@ -114,9 +127,7 @@ return;
 
 
 
-
-const locations:
-(AttackLocation | null)[] =
+const locations =
 
 await Promise.all(
 
@@ -146,41 +157,37 @@ await geoRes.json();
 
 
 
-
 return {
 
 
-ip:
-alert.ip,
+ip:alert.ip,
 
 
-title:
-alert.title,
+title:alert.title,
 
 
-severity:
-alert.severity,
+severity:alert.severity,
 
 
 
-lat:
-Number(geo.lat) || 0,
+lat:Number(geo.lat) || 0,
+
+
+lng:Number(geo.lng) || 0,
 
 
 
-lng:
-Number(geo.lng) || 0,
+country:geo.country || "Unknown",
+
+
+city:geo.city || "Unknown",
 
 
 
-country:
-geo.country || "Unknown",
+targetLat:SOC_LOCATION.lat,
 
 
-
-city:
-geo.city || "Unknown"
-
+targetLng:SOC_LOCATION.lng
 
 
 };
@@ -189,10 +196,10 @@ geo.city || "Unknown"
 
 }
 
-catch(error){
+catch(err){
 
 
-console.log(error);
+console.log(err);
 
 
 return null;
@@ -201,8 +208,8 @@ return null;
 }
 
 
-
 }
+
 
 )
 
@@ -213,52 +220,47 @@ return null;
 
 
 
-const cleanLocations =
+
+const filtered =
 
 locations.filter(
 
-(location):
+(item):
 
-location is AttackLocation =>
+item is AttackLocation =>
 
-location !== null
+item !== null
 
 );
 
 
 
 
-
-setAttacks(
-cleanLocations
-);
+setAttacks(filtered);
 
 
 
 }
 
-catch(error){
-
+catch(err){
 
 console.log(
 "ATTACK MAP ERROR",
-error
+err
 );
-
 
 }
 
 finally{
 
-
 setLoading(false);
 
-
 }
 
 
 
 }
+
 
 
 
@@ -268,7 +270,6 @@ setLoading(false);
 
 
 if(loading){
-
 
 return (
 
@@ -287,7 +288,6 @@ Loading Attack Map...
 
 );
 
-
 }
 
 
@@ -298,8 +298,8 @@ Loading Attack Map...
 
 
 
-return (
 
+return (
 
 <div className="
 rounded-2xl
@@ -340,6 +340,8 @@ scale:140
 
 
 
+
+
 <Geographies geography={geoUrl}>
 
 
@@ -351,15 +353,11 @@ geographies.map((geo:any)=>(
 
 <Geography
 
-
 key={geo.rsmKey}
-
 
 geography={geo}
 
-
 style={{
-
 
 default:{
 
@@ -369,7 +367,6 @@ outline:"none"
 
 },
 
-
 hover:{
 
 fill:"#334155",
@@ -378,7 +375,6 @@ outline:"none"
 
 },
 
-
 pressed:{
 
 fill:"#334155",
@@ -386,7 +382,6 @@ fill:"#334155",
 outline:"none"
 
 }
-
 
 }}
 
@@ -408,6 +403,9 @@ outline:"none"
 
 
 
+
+
+{/* Attack Markers */}
 
 
 
@@ -434,8 +432,6 @@ onClick={()=>setSelectedAttack(attack)}
 
 
 
-<>
-
 <circle
 
 r={10}
@@ -449,20 +445,32 @@ className="animate-ping"
 />
 
 
+
+
 <circle
 
 r={7}
 
 fill={
-attack.severity === "HIGH"
+
+attack.severity==="HIGH"
+
 ?
+
 "red"
+
 :
-attack.severity === "MEDIUM"
+
+attack.severity==="MEDIUM"
+
 ?
+
 "orange"
+
 :
+
 "green"
+
 }
 
 stroke="white"
@@ -471,7 +479,6 @@ strokeWidth={2}
 
 />
 
-</>
 
 
 
@@ -498,8 +505,6 @@ fontSize:"8px"
 
 
 
-
-
 </Marker>
 
 
@@ -507,6 +512,68 @@ fontSize:"8px"
 
 
 }
+
+
+
+
+
+
+
+
+{/* SOC Marker */}
+
+
+
+<Marker
+
+coordinates={[
+
+SOC_LOCATION.lng,
+
+SOC_LOCATION.lat
+
+]}
+
+>
+
+
+<circle
+
+r={8}
+
+fill="cyan"
+
+stroke="white"
+
+strokeWidth={2}
+
+/>
+
+
+
+<text
+
+textAnchor="middle"
+
+y={-15}
+
+style={{
+
+fill:"white",
+
+fontSize:"10px"
+
+}}
+
+>
+
+SOC
+
+</text>
+
+
+</Marker>
+
 
 
 
@@ -524,7 +591,10 @@ fontSize:"8px"
 
 
 
+
+
 {
+
 selectedAttack && (
 
 
@@ -538,12 +608,6 @@ p-5
 ">
 
 
-<div className="
-flex
-justify-between
-items-center
-">
-
 <h3 className="
 text-xl
 font-bold
@@ -555,36 +619,9 @@ text-white
 </h3>
 
 
-<button
-
-onClick={()=>setSelectedAttack(null)}
-
-className="
-text-slate-400
-hover:text-white
-"
-
->
-
-✕
 
 
-</button>
-
-
-</div>
-
-
-
-
-
-<div className="
-mt-4
-space-y-2
-">
-
-
-<p className="text-slate-300">
+<p className="text-slate-300 mt-3">
 
 <b>Title:</b> {selectedAttack.title}
 
@@ -602,24 +639,41 @@ space-y-2
 
 <p className="text-slate-300">
 
-<b>Location:</b> {selectedAttack.city}, {selectedAttack.country}
+<b>Location:</b>
+
+{selectedAttack.city},
+
+{selectedAttack.country}
 
 </p>
 
 
 
-<p className="
-text-red-400
-font-bold
-">
+<p className="text-red-400 font-bold">
 
-<b>Severity:</b> {selectedAttack.severity}
+<b>Severity:</b>
+
+{selectedAttack.severity}
 
 </p>
 
 
 
-</div>
+
+<button
+
+onClick={()=>setSelectedAttack(null)}
+
+className="
+mt-3
+text-cyan-400
+"
+
+>
+
+Close
+
+</button>
 
 
 
@@ -636,13 +690,10 @@ font-bold
 
 
 
-
-
 <div className="
 mt-5
 space-y-3
 ">
-
 
 
 {
@@ -654,6 +705,8 @@ attacks.map((attack,index)=>(
 
 key={index}
 
+onClick={()=>setSelectedAttack(attack)}
+
 className="
 rounded-lg
 bg-[#0f172a]
@@ -661,8 +714,6 @@ p-4
 cursor-pointer
 hover:bg-slate-900
 "
-
-onClick={()=>setSelectedAttack(attack)}
 
 >
 
@@ -690,20 +741,9 @@ text-sm
 
 
 <p className="
-text-slate-400
-text-sm
-">
-
-{attack.city}, {attack.country}
-
-</p>
-
-
-
-<p className="
 text-red-400
-text-sm
 font-bold
+text-sm
 ">
 
 {attack.severity}
@@ -722,35 +762,13 @@ font-bold
 
 
 
-
-
-
-{
-
-attacks.length===0 &&
-
-<p className="
-text-slate-400
-">
-
-No attack locations found
-
-</p>
-
-}
-
-
-
 </div>
 
 
 
 
 
-
-
 </div>
-
 
 );
 
