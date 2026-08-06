@@ -1,13 +1,11 @@
 import {
-NextRequest,
-NextResponse
+  NextRequest,
+  NextResponse
 } from "next/server";
 
-
 import {
-connectDB
+  connectDB
 } from "@/lib/mongodb";
-
 
 import Incident from "@/models/Incident";
 
@@ -16,16 +14,73 @@ import Alert from "@/models/Alert";
 
 
 
-export async function POST(
-req:NextRequest
-){
 
+export async function GET(){
 
 try{
 
 
 await connectDB();
 
+
+const incidents =
+
+await Incident.find()
+
+.sort({
+
+createdAt:-1
+
+});
+
+
+
+return NextResponse.json(
+incidents
+);
+
+
+}
+catch(error){
+
+
+console.log(error);
+
+
+
+return NextResponse.json(
+
+{
+message:"Failed to load incidents"
+},
+
+{
+status:500
+}
+
+);
+
+
+}
+
+}
+
+
+
+
+
+
+
+export async function POST(
+
+req:NextRequest
+
+){
+
+try{
+
+
+await connectDB();
 
 
 const body =
@@ -34,6 +89,7 @@ await req.json();
 
 
 const existing =
+
 await Incident.findOne({
 
 alertId:body.alertId
@@ -44,19 +100,19 @@ alertId:body.alertId
 
 if(existing){
 
-
 return NextResponse.json(
+
 {
 message:"Incident already exists"
 },
+
 {
 status:400
 }
+
 );
 
-
 }
-
 
 
 
@@ -83,7 +139,6 @@ status:"OPEN"
 
 
 
-
 await Alert.findByIdAndUpdate(
 
 body.alertId,
@@ -101,7 +156,6 @@ incident._id.toString()
 
 
 
-
 return NextResponse.json(
 
 incident,
@@ -113,7 +167,6 @@ status:201
 );
 
 
-
 }
 catch(error){
 
@@ -123,16 +176,18 @@ console.log(error);
 
 
 return NextResponse.json(
+
 {
 message:"Incident creation failed"
 },
+
 {
 status:500
 }
+
 );
 
 
 }
-
 
 }

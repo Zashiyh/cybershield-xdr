@@ -8,7 +8,7 @@ export interface IIncident extends Document {
 
   title:string;
 
-  alertId:string;
+  alertId: mongoose.Types.ObjectId;
 
   ip:string;
 
@@ -18,7 +18,15 @@ export interface IIncident extends Document {
 
   description:string;
 
+  assignedTo:string;
+
+  notes:string;
+
+  resolvedAt:Date | null;
+
   createdAt:Date;
+
+  updatedAt:Date;
 
 }
 
@@ -38,13 +46,13 @@ required:true
 },
 
 
+
 alertId:{
-
-type:String,
-
-required:true
-
+  type:mongoose.Schema.Types.ObjectId,
+  ref:"Alert",
+  required:true
 },
+
 
 
 ip:{
@@ -83,6 +91,36 @@ type:String,
 
 default:""
 
+},
+
+
+
+assignedTo:{
+
+type:String,
+
+default:"Unassigned"
+
+},
+
+
+
+notes:{
+
+type:String,
+
+default:""
+
+},
+
+
+
+resolvedAt:{
+
+type:Date,
+
+default:null
+
 }
 
 
@@ -99,11 +137,16 @@ timestamps:true
 
 
 
+
+
 export default
 
 mongoose.models.Incident ||
 
 mongoose.model<IIncident>(
+
 "Incident",
+
 IncidentSchema
+
 );
