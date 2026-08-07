@@ -46,7 +46,7 @@ const menu = [
   },
   {
     name: "Threat Intelligence",
-    href: "/dashboard/intelligence",
+    href: "/dashboard/threat-intelligence",
     icon: Globe,
   },
   {
