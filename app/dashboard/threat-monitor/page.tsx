@@ -12,7 +12,7 @@ import LiveFeed from "@/components/threat-monitor/LiveFeed";
 import RecentEvents from "@/components/threat-monitor/RecentEvents";
 import AttackMap from "@/components/threat-monitor/AttackMap";
 import LiveAttackFeed from "@/components/threat-monitor/LiveAttackFeed";
-
+import GlobeContainer from "@/components/threat-monitor/GlobeContainer";
 
 
 
@@ -306,7 +306,7 @@ data={data}
 
 
 
-
+<GlobeContainer />
 
 
 
